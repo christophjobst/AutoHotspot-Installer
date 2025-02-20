@@ -115,9 +115,6 @@ hostapd_config()
 			echo ""
 			echo "Hostapd failed to install. Check there is internet access"
 			echo "and try again"
-			echo "Press a key to continue"
-			read
-			menu
 		fi
 	fi
 	echo "Hostapd is installed"
@@ -176,9 +173,6 @@ dnsmasq_config()
 		    echo ""
 			echo "dnsmasq failed to install. Check there is internet access"
 			echo "and try again"
-			echo "Press a key to continue"
-			read
-			menu
 		fi
 	fi
 	if [ -f "/etc/dnsmasq.conf" ] ; then
@@ -383,36 +377,30 @@ Hotspotssid()
 	#Change the Default Hotspot SSID and Password
 	if  [ ! -f "/etc/hostapd/hostapd.conf" ] ;then
 		echo "An Access Point is not installed. No Password to change"
-		echo "press enter to continue"
-		read
-		menu
 	fi
 	HSssid=($(cat "/etc/hostapd/hostapd.conf" | grep '^ssid='))
 	HSpass=($(cat "/etc/hostapd/hostapd.conf" | grep '^wpa_passphrase='))
 	echo "Change the Access Point's SSID and Password. press enter to keep existing settings"
 	echo "The current SSID is:" "${HSssid:5}"
 	echo "The current SSID Password is:" "${HSpass:15}"
-	echo "Enter the new Access Point SSID:"
-	read ssname
-	echo "Enter the hotspots new password. Minimum 8 characters"
-	read sspwd
-	if [ ! -z $ssname ] ;then
-		echo "Changing Hotspot SSID to:" "$ssname" 
-		sed -i -e "/^ssid=/c\ssid=$ssname" /etc/hostapd/hostapd.conf
+	echo "New Access Point SSID: $1"
+	echo "New password: $2"
+	
+	if [ ! -z $1 ] ;then
+		echo "Changing Hotspot SSID to: $1"
+		sed -i -e "/^ssid=/c\ssid=$1" /etc/hostapd/hostapd.conf
 	else
 		echo "The Hotspot SSID is"  ${HSssid: 5}
 	fi
-	if [ ! -z $sspwd ] && [ ${#sspwd} -ge 8 ] ;then
-		echo "Changing Access Point Password to:" "$sspwd"
-		sed -i -e "/^wpa_passphrase=/c\wpa_passphrase=$sspwd" /etc/hostapd/hostapd.conf
+	if [ ! -z $2 ] ;then
+		echo "Changing Access Point Password to: $2"
+		sed -i -e "/^wpa_passphrase=/c\wpa_passphrase=$2" /etc/hostapd/hostapd.conf
 	else
 		echo "The Access Point Password is:"  ${HSpass: 15}
 	fi
 	echo ""
 	echo "The new setup will be available next time the hotspot is started"
-	echo "Press a key to continue"
-	read
-	menu
+    
 }
 
 setupssid()
@@ -495,6 +483,18 @@ setupssid()
 	fi
 }
 
+newSsidConnection()
+{
+    #check for blank in return
+    echo "$1"
+    echo ""
+    if [ "$1" = "Cancel" ] || [ "$1" = "" ] ; then
+        exit
+    fi
+
+    echo -e "\nnetwork={\n\tssid=\x22$1\x22\n\tpsk=\x22$2\x22\n\tkey_mgmt=WPA-PSK\n}" >> /etc/wpa_supplicant/wpa_supplicant.conf
+}
+
 updatessid()
 {
 	#check for blank in return
@@ -541,9 +541,6 @@ forceswitch()
 {
 if [ ! -f "/etc/systemd/system/autohotspot.service" ] ;then
 	echo "No Autohotspot script installed, unable to continue"
-	echo "press enter to continue"
-	read
-	menu
 fi
 #Create Hotspot or connect to valid wifi networks
 echo 0 > /proc/sys/net/ipv4/ip_forward #deactivate ip forwarding
@@ -554,7 +551,6 @@ then
     echo "Switching to Network Wifi if it is available"
     echo "this takes about 20 seconds to complete checks"
 	systemctl restart autohotspot.service
-	menu
 elif { wpa_cli status | grep "$wifidev"; } >/dev/null 2>&1
 then
 	echo "Cleaning wifi files and Activating Hotspot"
@@ -616,9 +612,6 @@ get_HS_IP() #get ip address from current active hotspot script for Force Switch
 	else
 		echo "The Autohotspot is disabled or not installed"
 		echo "unable to force a switch."
-		echo "Press enter to continue"
-		read
-		menu
 	fi
 }
 
@@ -652,9 +645,6 @@ go()
 	elif [ "$opt" = "FOR" ] ;then
 		if [ ! -f "/etc/systemd/system/autohotspot.service" ] ;then
 			echo "No Autohotspot script installed, unable to continue"
-			echo "press enter to continue"
-			read
-			menu
 		fi
 		Aserv=($(cat /etc/systemd/system/autohotspot.service | grep "ExecStart="))
 		wi=($(cat ${Aserv: 10} | grep wifidev=))
@@ -733,4 +723,35 @@ done
 check_reqfiles
 check_installed
 check_wificountry
-menu #show menu
+#menu #show menu
+
+# Prüfe die Eingabeparameter
+if [ "$1" == "-i" ]; then
+    echo "Install Autohotspot"
+    go "AHN"
+    
+elif [ "$1" == "-a" ]; then
+    echo "Add a new wifi network to the Pi (SSID) or update the password for an existing one. Second parameter is ssid, third parameter is password."
+    newSsidConnection "$2" "$3"
+    
+elif [ "$1" == "-s" ]; then
+    echo "Autohotspot: Force to an access point or connect to WiFi network if a known SSID is in range"
+    go "FOR"
+
+elif [ "$1" == "-c" ]; then
+    echo "Change the access points SSID and password. Second parameter is the voltrader ssid, third parameter is the AP password."
+    Hotspotssid "$2" "$3"
+
+else
+    echo "Jostec Systems Autohotspot installation and setup"
+    echo "for installation or switching between access point types"
+    echo "or uninstall the access point back to standard Pi wifi"
+    echo ""
+    echo "Autohotspot Net = connects to a known wifi network in range,"
+    echo "otherwise automatically creates a Raspberry Pi access point with network/internet access if an"
+    echo "ethernet cable is connected. Uses wlan0, eth0. Pi's 3,3+,4"
+    echo ""
+    echo " -i = Install Autohotspot"
+    echo " -a = Add a new wifi network to the Pi (SSID) or update the password for an existing one. Second parameter is ssid, third parameter is password."
+    echo " -s = Autohotspot: Force to an access point or connect to WiFi network if a known SSID is in range"
+    echo " -c = Change the access points SSID and password. Second parameter is the voltrader ssid, third parameter is the AP password."
