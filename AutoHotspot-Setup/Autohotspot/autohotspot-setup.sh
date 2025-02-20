@@ -397,8 +397,8 @@ Hotspotssid()
 		echo "The Access Point Password is:"  ${HSpass: 15}
 	fi
 	echo ""
-	echo "The new setup will be available next time the hotspot is started"
-    
+	echo "The new setup will be available after this reboot"
+    reboot
 }
 
 setupssid()
@@ -486,6 +486,9 @@ newSsidConnection()
     fi
 
     echo -e "\nnetwork={\n\tssid=\x22$1\x22\n\tpsk=\x22$2\x22\n\tkey_mgmt=WPA-PSK\n}" >> /etc/wpa_supplicant/wpa_supplicant.conf
+    echo "added new network to wpa_supplicant"
+    reboot
+
 }
 
 updatessid()
@@ -662,6 +665,8 @@ go()
 		echo "The Hotspots WiFi SSID name is: ${HSssid: 5}"
 		echo "The WiFi password is: ${HSpass: 15}"
 		display_HS_IP
+        echo "Restart System now!"
+        reboot
 	fi
 	
 }
