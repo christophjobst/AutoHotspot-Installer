@@ -96,8 +96,6 @@ check_wificountry()
 		echo "From the desktop this can be done in the menu Preferences - Raspberry Pi Configuration - Localisation" 
 		echo "Once done please try again."
 		echo ""
-		echo "press a key to continue"
-		read
 	fi
 }
 
@@ -380,7 +378,7 @@ Hotspotssid()
 	fi
 	HSssid=($(cat "/etc/hostapd/hostapd.conf" | grep '^ssid='))
 	HSpass=($(cat "/etc/hostapd/hostapd.conf" | grep '^wpa_passphrase='))
-	echo "Change the Access Point's SSID and Password. press enter to keep existing settings"
+	echo "Change the Access Point's SSID and Password."
 	echo "The current SSID is:" "${HSssid:5}"
 	echo "The current SSID Password is:" "${HSpass:15}"
 	echo "New Access Point SSID: $1"
@@ -421,8 +419,6 @@ setupssid()
 		#if wifi device errors recheck
 		if (($j >= 5)); then #if busy 5 times exit to menu
 			echo "WiFi Device Unavailable, cannot scan for wifi devices at this time"
-			echo "press a key to continue"
-			menu
 			break
 		elif echo "${localwifi[1]}" | grep "No such device (-19)" >/dev/null 2>&1; then
 			echo "No Device found,trying again"
@@ -464,9 +460,6 @@ setupssid()
 	if [ "${#wfselect[@]}" -eq 1 ] ;then
 		echo "Unable to detect local WiFi devices. Maybe there is a temporary issue with your WiFi"
 		echo "Try again in a minute"
-		echo "press a enter to continue"
-		read
-		menu
 	fi
 
 	read wf
@@ -501,7 +494,6 @@ updatessid()
 	echo "$1"
 	echo ""
 	if [ "$1" = "Cancel" ] || [ "$1" = "" ] ; then
-		menu
 		exit
 	fi
 
@@ -671,8 +663,6 @@ go()
 		echo "The WiFi password is: ${HSpass: 15}"
 		display_HS_IP
 	fi
-	echo "Press any key to continue"
-	read
 	
 }
 
