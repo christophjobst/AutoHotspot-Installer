@@ -487,7 +487,6 @@ newSsidConnection()
 
     echo -e "\nnetwork={\n\tssid=\x22$1\x22\n\tpsk=\x22$2\x22\n\tkey_mgmt=WPA-PSK\n}" >> /etc/wpa_supplicant/wpa_supplicant.conf
     echo "added new network to wpa_supplicant"
-    reboot
 
 }
 
