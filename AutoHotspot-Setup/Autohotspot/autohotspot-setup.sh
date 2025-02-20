@@ -719,18 +719,22 @@ check_wificountry
 if [ "$1" == "-i" ]; then
     echo "Install Autohotspot"
     go "AHN"
+    exit
     
 elif [ "$1" == "-a" ]; then
     echo "Add a new wifi network to the Pi (SSID) or update the password for an existing one. Second parameter is ssid, third parameter is password."
     newSsidConnection "$2" "$3"
+    exit
     
 elif [ "$1" == "-s" ]; then
     echo "Autohotspot: Force to an access point or connect to WiFi network if a known SSID is in range"
     go "FOR"
+    exit
 
 elif [ "$1" == "-c" ]; then
     echo "Change the access points SSID and password. Second parameter is the voltrader ssid, third parameter is the AP password."
     Hotspotssid "$2" "$3"
+    exit
 
 else
     echo "Jostec Systems Autohotspot installation and setup"
@@ -745,3 +749,4 @@ else
     echo " -a = Add a new wifi network to the Pi (SSID) or update the password for an existing one. Second parameter is ssid, third parameter is password."
     echo " -s = Autohotspot: Force to an access point or connect to WiFi network if a known SSID is in range"
     echo " -c = Change the access points SSID and password. Second parameter is the voltrader ssid, third parameter is the AP password."
+    exit
