@@ -750,3 +750,4 @@ else
     echo " -s = Autohotspot: Force to an access point or connect to WiFi network if a known SSID is in range"
     echo " -c = Change the access points SSID and password. Second parameter is the voltrader ssid, third parameter is the AP password."
     exit
+fi
