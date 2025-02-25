@@ -397,8 +397,8 @@ Hotspotssid()
 		echo "The Access Point Password is:"  ${HSpass: 15}
 	fi
 	echo ""
-	echo "The new setup will be available after this reboot"
-    reboot
+	#echo "The new setup will be available after this reboot"
+    #reboot
 }
 
 setupssid()
@@ -664,8 +664,8 @@ go()
 		echo "The Hotspots WiFi SSID name is: ${HSssid: 5}"
 		echo "The WiFi password is: ${HSpass: 15}"
 		display_HS_IP
-        echo "Restart System now!"
-        reboot
+        #echo "Restart System now!"
+        #reboot
 	fi
 	
 }
